@@ -16,6 +16,42 @@ typedef struct {
     float density; // populacao / area
 } Carta;
 
+// Função para exibir o menu de atributos
+void showMenu(int delete) {
+    printf("\nEscolha um atributo para comparar:\n");
+    if (delete != 1) printf("1 - População\n");
+    if (delete != 2) printf("2 - Área\n");
+    if (delete != 3) printf("3 - PIB\n");
+    if (delete != 4) printf("4 - Pontos Turísticos\n");
+    if (delete != 5) printf("5 - Densidade Demográfica\n");
+    printf("Opção: ");
+}
+
+// Função para obter valor de atributo de uma carta
+float getValueAttribute(Carta c, int attribute) {
+    switch(attribute) {
+        case 1: return (float)c.population;
+        case 2: return c.territory;
+        case 3: return c.gdp;
+        case 4: return (float)c.touristPoints;
+        case 5: return c.density;
+        default: return 0.0;
+    }
+}
+
+// Função para exibir nome do atributo
+const char* attributeName(int attribute) {
+    switch(attribute) {
+        case 1: return "População";
+        case 2: return "Área";
+        case 3: return "PIB";
+        case 4: return "Pontos Turísticos";
+        case 5: return "Densidade Demográfica";
+        default: return "Desconhecido";
+    }
+}
+
+
 
 int main() {
     // Duas cartas pré-cadastradas
@@ -26,91 +62,74 @@ int main() {
     carta1.density = (float)carta1.population / carta1.territory;
     carta2.density = (float)carta2.population / carta2.territory;
 
+    int attribute1, attribute2;
+
     int option;
 
     printf("===== SUPER TRUNFO =====\n");
     printf("Comparando as cartas: %s x %s\n", carta1.name, carta2.name);
-    printf("\nEscolha o atributo para comparar:\n");
-    printf("1 - População\n");
-    printf("2 - Área\n");
-    printf("3 - PIB\n");
-    printf("4 - Pontos Turísticos\n");
-    printf("5 - Densidade Demográfica\n");
-    printf("Opção: ");
-    scanf("%d", &option);
 
-    printf("\n--- Resultado da Comparação ---\n");
+    // Escolha do primeiro atributo
+    showMenu(0);
+    scanf("%d", &attribute1);
+
+    // Escolha do segundo atributo (dinâmico: remove o primeiro da lista)
+    showMenu(attribute1);
+    scanf("%d", &attribute2);
+
+    // Obter valores
+    float value1_attr1 = getValueAttribute(carta1, attribute1);
+    float value2_attr1 = getValueAttribute(carta2, attribute1);
+    float value1_attr2 = getValueAttribute(carta1, attribute2);
+    float value2_attr2 = getValueAttribute(carta2, attribute2);
 
 
-    switch(option) {
-        case 1: // População
-            printf("Atributo: População\n");
-            printf("%s: %d\n", carta1.name, carta1.population);
-            printf("%s: %d\n", carta2.name, carta2.population);
-            if (carta1.population > carta2.population) {
-                printf("Resultado: %s venceu!\n", carta1.name);
-            } else if (carta2.population > carta1.population) {
-                printf("Resultado: %s venceu!\n", carta2.name);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
+    // Comparação dos atributos individualmente
+    printf("\n--- Comparação Atributo 1 (%s) ---\n", attributeName(attribute1));
+    printf("%s: %.2f\n", carta1.name, value1_attr1);
+    printf("%s: %.2f\n", carta2.name, value2_attr1);
 
-        case 2: // Área
-            printf("Atributo: Área\n");
-            printf("%s: %.2f km²\n", carta1.name, carta1.territory);
-            printf("%s: %.2f km²\n", carta2.name, carta2.territory);
-            if (carta1.territory > carta2.territory) {
-                printf("Resultado: %s venceu!\n", carta1.name);
-            } else if (carta2.territory > carta1.territory) {
-                printf("Resultado: %s venceu!\n", carta2.name);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
+    int winner_attr1;
+    if (attribute1 == 5) { // densidade -> menor vence
+        winner_attr1 = (value1_attr1 < value2_attr1) ? 1 : (value2_attr1 < value1_attr1 ? 2 : 0);
+    } else {
+        winner_attr1 = (value1_attr1 > value2_attr1) ? 1 : (value2_attr1 > value1_attr1 ? 2 : 0);
+    }
+    winner_attr1 == 0 ? printf("Empate!\n") :
+    printf("Vencedor: %s\n", winner_attr1 == 1 ? carta1.name : carta2.name);
 
-        case 3: // PIB
-            printf("Atributo: PIB\n");
-            printf("%s: %.2e\n", carta1.name, carta1.gdp);
-            printf("%s: %.2e\n", carta2.name, carta2.gdp);
-            if (carta1.gdp > carta2.gdp) {
-                printf("Resultado: %s venceu!\n", carta1.name);
-            } else if (carta2.gdp > carta1.gdp) {
-                printf("Resultado: %s venceu!\n", carta2.name);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
 
-        case 4: // Pontos Turísticos
-            printf("Atributo: Pontos Turísticos\n");
-            printf("%s: %d\n", carta1.name, carta1.touristPoints);
-            printf("%s: %d\n", carta2.name, carta2.touristPoints);
-            if (carta1.touristPoints > carta2.touristPoints) {
-                printf("Resultado: %s venceu!\n", carta1.name);
-            } else if (carta2.touristPoints > carta1.touristPoints) {
-                printf("Resultado: %s venceu!\n", carta2.name);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
+    printf("\n--- Comparação Atributo 2 (%s) ---\n", attributeName(attribute2));
+    printf("%s: %.2f\n", carta1.name, value1_attr2);
+    printf("%s: %.2f\n", carta2.name, value2_attr2);
 
-        case 5: // Densidade Demográfica (menor vence!)
-            printf("Atributo: Densidade Demográfica\n");
-            printf("%s: %.6f hab/km²\n", carta1.name, carta1.density);
-            printf("%s: %.6f hab/km²\n", carta2.name, carta2.density);
-            if (carta1.density < carta2.density) {
-                printf("Resultado: %s venceu!\n", carta1.name);
-            } else if (carta2.density < carta1.density) {
-                printf("Resultado: %s venceu!\n", carta2.name);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
+    int winner_attr2;
+    if (attribute2 == 5) { // densidade -> menor vence
+        winner_attr2 = (value1_attr2 < value2_attr2) ? 1 : (value2_attr2 < value1_attr2 ? 2 : 0);
+    } else {
+        winner_attr2 = (value1_attr2 > value2_attr2) ? 1 : (value2_attr2 > value1_attr2 ? 2 : 0);
+    }
+    winner_attr2 == 0 ? printf("Empate!\n") :
+    printf("Vencedor: %s\n", winner_attr2 == 1 ? carta1.name : carta2.name);
+    
 
-        default:
-            printf("Opção inválida! Escolha entre 1 e 5.\n");
-            break;
+    // Soma dos atributos (densidade invertida -> transforma em "força" com inverso)
+    float soma1 = (attribute1 == 5 ? (1/value1_attr1) : value1_attr1) +
+                  (attribute2 == 5 ? (1/value1_attr2) : value1_attr2);
+
+    float soma2 = (attribute1 == 5 ? (1/value2_attr1) : value2_attr1) +
+                  (attribute2 == 5 ? (1/value2_attr2) : value2_attr2);
+
+    printf("\n--- Resultado Final (Soma dos Atributos) ---\n");
+    printf("%s: %.2f\n", carta1.name, soma1);
+    printf("%s: %.2f\n", carta2.name, soma2);
+
+    if (soma1 > soma2) {
+        printf("Resultado Final: %s venceu!\n", carta1.name);
+    } else if (soma2 > soma1) {
+        printf("Resultado Final: %s venceu!\n", carta2.name);
+    } else {
+        printf("Resultado Final: Empate!\n");
     }
 
     return 0;
